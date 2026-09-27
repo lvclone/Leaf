@@ -8,6 +8,7 @@ import com.tencent.devops.leaf.service.SegmentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
+@ConditionalOnProperty(prefix = "leaf.segment", name = "enable", havingValue = "true")
 public class LeafMonitorController {
     private Logger logger = LoggerFactory.getLogger(LeafMonitorController.class);
 

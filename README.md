@@ -77,7 +77,7 @@ https://github.com/ci-plugins/Leaf/blob/master/README.md
 
 Leaf 提供两种生成的ID的方式（号段模式和snowflake模式），你可以同时开启两种方式，也可以指定开启某种方式（默认两种方式为关闭状态）。
 
-Leaf Server的配置都在yml中
+Leaf Server 支持通过 YAML 或环境变量配置。环境变量模板见 [`leaf-server/.env.example`](./leaf-server/.env.example)。
 
 | 配置项                    | 含义                          | 默认值 |
 | ------------------------- | ----------------------------- | ------ |
@@ -88,8 +88,22 @@ Leaf Server的配置都在yml中
 | leaf.segment.username        | mysql 用户名                  |        |
 | leaf.segment.password        | mysql 密码                    |        |
 | leaf.snowflake.enable     | 是否开启snowflake模式         | false  |
-| leaf.snowflake.zk.address | snowflake模式下的zk地址       |        |
+| leaf.snowflake.address | snowflake模式下的zk地址       |        |
 | leaf.snowflake.port       | snowflake模式下的服务注册端口 |        |
+
+环境变量使用 Spring Boot 的映射规则：配置项改为大写，并用下划线分隔。例如 `leaf.segment.enable` 对应 `LEAF_SEGMENT_ENABLE`，`leaf.snowflake.address` 对应 `LEAF_SNOWFLAKE_ADDRESS`。模板也包含本地 MySQL 的 Docker Compose 配置和初始化 SQL。首次运行时，在 `leaf-server` 目录中执行：
+
+```shell
+cp .env.example .env
+docker compose --env-file .env up -d mysql
+docker compose ps
+set -a
+. ./.env
+set +a
+mvn spring-boot:run
+```
+
+MySQL 首次初始化会创建 `T_LEAF_ALLOC` 并写入 `leaf-segment-test`。示例账号仅供本机开发，部署到共享或生产环境前请更换密码。`.env` 已加入忽略规则，避免本地密码误提交。
 
 #### 号段模式
 
@@ -127,7 +141,7 @@ insert into T_LEAF_ALLOC(BIZ_TAG, MAX_ID, STEP, DESCRIPTION) values('leaf-segmen
 
 ##### 配置zookeeper地址
 
-在yml中配置leaf.snowflake.zk.address，配置leaf 服务监听的端口leaf.snowflake.port。
+配置 `leaf.snowflake.address` 和 `leaf.snowflake.port`（对应环境变量 `LEAF_SNOWFLAKE_ADDRESS` 和 `LEAF_SNOWFLAKE_PORT`）。
 #### 运行Leaf Server
 
 ##### 打包服务

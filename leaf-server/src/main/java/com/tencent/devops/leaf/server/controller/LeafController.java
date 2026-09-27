@@ -15,18 +15,24 @@ import org.springframework.web.bind.annotation.RestController;
 public class LeafController {
     private Logger logger = LoggerFactory.getLogger(LeafController.class);
 
-    @Autowired
+    @Autowired(required = false)
     private SegmentService segmentService;
-    @Autowired
+    @Autowired(required = false)
     private SnowflakeService snowflakeService;
 
     @RequestMapping(value = "/api/segment/get/{key}")
     public String getSegmentId(@PathVariable("key") String key) {
+        if (segmentService == null) {
+            throw new LeafServerException("Segment mode is disabled");
+        }
         return get(key, segmentService.getId(key));
     }
 
     @RequestMapping(value = "/api/snowflake/get/{key}")
     public String getSnowflakeId(@PathVariable("key") String key) {
+        if (snowflakeService == null) {
+            throw new LeafServerException("Snowflake mode is disabled");
+        }
         return get(key, snowflakeService.getId(key));
     }
 

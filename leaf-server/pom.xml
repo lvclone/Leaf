@@ -34,6 +34,11 @@
             <artifactId>leaf-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.tencent.devops.leaf</groupId>
+            <artifactId>leaf-boot-starter</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
         </dependency>

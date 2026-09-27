@@ -2,15 +2,13 @@ package com.tencent.devops.leaf.plugin;
 
 import com.tencent.devops.leaf.common.PropertyFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
 
-@Component
 @ConfigurationProperties(prefix = "leaf",ignoreUnknownFields = true)
 public class LeafSpringBootProperties {
     private String name;
-    private Segment segment;
-    private Snowflake snowflake;
+    private Segment segment = new Segment();
+    private Snowflake snowflake = new Snowflake();
     public static class Segment{
         private boolean enable=false;
         private String allocStrategyDaoBeanName;

@@ -8,9 +8,7 @@ import com.tencent.devops.leaf.segment.dao.IDAllocDao;
 import com.tencent.devops.leaf.segment.dao.impl.IDAllocDaoImpl;
 import com.tencent.devops.leaf.service.SegmentService;
 import com.tencent.devops.leaf.service.SnowflakeService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,10 +19,6 @@ import org.springframework.util.StringUtils;
 @Configuration
 @EnableConfigurationProperties(LeafSpringBootProperties.class)
 public class LeafSpringBootStarterAutoConfigure {
-    private final Logger logger = LoggerFactory.getLogger(LeafSpringBootStarterAutoConfigure.class);
-    @Autowired
-    private LeafSpringBootProperties properties;
-
     @Bean
     public LeafSpringContextUtil leafSpringContextUtil() {
         return new LeafSpringContextUtil();
@@ -32,9 +26,10 @@ public class LeafSpringBootStarterAutoConfigure {
 
     @Bean
     @DependsOn(value = {"leafSpringContextUtil"})
-    public SegmentService initLeafSegmentStarter() throws Exception {
+    @ConditionalOnProperty(prefix = "leaf.segment", name = "enable", havingValue = "true")
+    public SegmentService initLeafSegmentStarter(LeafSpringBootProperties properties) throws Exception {
         LeafSpringBootProperties.Segment segment = properties.getSegment();
-        if (properties != null && segment != null && segment.isEnable()) {
+        if (segment != null) {
             String allocStrategyDaoBeanName = segment.getAllocStrategyDaoBeanName();
             IDAllocDao allocDao = null;
             if (!StringUtils.isEmpty(allocStrategyDaoBeanName)) {
@@ -57,16 +52,15 @@ public class LeafSpringBootStarterAutoConfigure {
             }
             return new SegmentService(allocDao);
         }
-        logger.warn("init leaf segment ignore properties is {}", properties);
-        return null;
+        throw new IllegalStateException("leaf.segment configuration is required when segment mode is enabled");
     }
 
     @Bean
-    public SnowflakeService initLeafSnowflakeStarter() throws InitException {
-        if (properties != null && properties.getSnowflake() != null && properties.getSnowflake().isEnable()) {
+    @ConditionalOnProperty(prefix = "leaf.snowflake", name = "enable", havingValue = "true")
+    public SnowflakeService initLeafSnowflakeStarter(LeafSpringBootProperties properties) throws InitException {
+        if (properties.getSnowflake() != null) {
             return new SnowflakeService(properties.getSnowflake().getAddress(), properties.getSnowflake().getPort());
         }
-        logger.warn("init leaf snowflake ignore properties is {}", properties);
-        return null;
+        throw new IllegalStateException("leaf.snowflake configuration is required when snowflake mode is enabled");
     }
 }
