@@ -36,7 +36,7 @@ leaf:
   segment:
     allocStrategyDaoBeanName: jooqIDAllocDaoImpl
     enable: true
-    url: jdbc:mysql://xxxxxx/devops_project?useSSL=false&autoReconnect=true&serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf8&allowMultiQueries=true
+    url: jdbc:mysql://xxxxxx/devops_project?useSSL=false&autoReconnect=true&allowPublicKeyRetrieval=true&serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf8&allowMultiQueries=true
     username: xxx
     password: xxx
   snowflake:
